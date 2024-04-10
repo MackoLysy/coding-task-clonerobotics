@@ -1,3 +1,8 @@
+use clap::Parser;
+
+mod args;
+
 fn main() {
-    println!("Hello, world!");
+    let parser = args::ArgParser::parse();
+    println!("Hello, world! {}", parser.get_host());
 }
