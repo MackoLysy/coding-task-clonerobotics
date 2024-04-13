@@ -93,7 +93,7 @@ mod tests {
     #[should_panic]
     fn socket_parser_test_should_not_pass_badadress() {
         let server = HttpServer::new("bad_address".to_string(), 8080);
-        let result = server.get_socket_addr();
+        let _ = server.get_socket_addr();
     }
 
     #[test]

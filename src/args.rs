@@ -10,7 +10,7 @@ pub struct ArgParser {
     #[clap(long, env, default_value = "localhost")]
     host: String,
     #[clap(long, env, default_value = "7100")]
-    port: u32,
+    port: u16,
     #[clap(long, env, default_value = "./")]
     databse_path: String,
 }
@@ -24,7 +24,7 @@ impl ArgParser {
     pub fn get_host(&self) -> &String {
         &self.host
     }
-    pub fn get_port(&self) -> u32 {
+    pub fn get_port(&self) -> u16 {
         self.port
     }
     pub fn get_databse_path(&self) -> &String {
