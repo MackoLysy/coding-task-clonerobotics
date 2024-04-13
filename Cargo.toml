@@ -15,3 +15,6 @@ tokio = { version = "1.37.0", features = ["full"] }
 chrono = "0.4.37"
 log = "0.4.0"
 pretty_env_logger = "0.5.0"
+use = "0.0.1-pre.0"
+serial2-tokio = { version = "0.1.9" }
+regex = "1.10.4"
