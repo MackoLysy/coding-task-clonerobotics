@@ -1,5 +1,3 @@
-use std::error::Error;
-
 use super::IParser;
 use log::*;
 use regex::Regex;
@@ -36,7 +34,8 @@ impl IParser for Parser {
         if validate.is_ok() {
             for mat in self.parretn.captures_iter(validate.unwrap().as_str()) {
                 trace!("matching: {:#?}", mat);
-                return Some(mat[0].to_string());
+                self.buff.clear();
+                return Some(mat[0].replace('\n', ""));
             }
         } else {
             error!("error validate buffer");
@@ -62,6 +61,7 @@ mod tests {
         let mut parser = Parser::new();
         let result = parser.parse_vec(text.as_bytes().to_vec());
         assert_eq!(result.is_some(), true);
+        assert_eq!(result.unwrap(), "$1");
     }
     #[test]
     fn simple_vec_test_invalid_msg() {
@@ -76,7 +76,6 @@ mod tests {
         let mut parser = Parser::new();
         let result = parser.parse_vec(text.as_bytes().to_vec());
         assert_eq!(result.is_some(), true);
+        assert_eq!(result.unwrap(), "$1,v1,v2");
     }
 }
-
-// \$([0-9]).*\n
