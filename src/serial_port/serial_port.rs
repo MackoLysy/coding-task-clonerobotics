@@ -2,6 +2,7 @@ use super::*;
 use crate::errors::Errors;
 use log::*;
 use std::error::Error;
+
 impl SerialPort {
     pub fn new(port_name: String, baudrate: u32) -> Self {
         SerialPort {
@@ -9,6 +10,7 @@ impl SerialPort {
             baudrate: baudrate,
             port: None,
             parser: None,
+            readable: None,
         }
     }
     pub fn init(&mut self) -> Result<(), Box<dyn Error>> {
@@ -28,7 +30,7 @@ impl SerialPort {
         info!("Serial port started on port {}", self.port_name);
         Ok(())
     }
-    pub async fn start(&self) -> Result<(), Box<dyn Error>> {
+    pub async fn start(&mut self) -> Result<(), Box<dyn Error>> {
         info!("Reading {}", self.port_name);
         if self.port.is_none() {
             return Err(Box::new(Errors::new("Port is not setted")));
@@ -37,9 +39,36 @@ impl SerialPort {
         let mut buff = [0];
         loop {
             match port.read(&mut buff).await {
-                Ok(_) => {
-                    info!("reading {:?}", &buff);
-                }
+                Ok(_) => match self.parser.clone() {
+                    Some(parser) => {
+                        let val = parser.as_ref().lock().unwrap().parse(buff[0]);
+                        if val.is_some() {
+                            let readable = self.readable.clone();
+                            match readable {
+                                Some(r) => {
+                                    let mut guard = r.lock().unwrap();
+                                    let val = guard.read(val.unwrap());
+                                    if (val.is_some()) {
+                                        match port.write_all(val.unwrap().as_bytes()).await {
+                                            Ok(_) => {
+                                                trace!("data sended!")
+                                            }
+                                            Err(_) => error!("faield to send data"),
+                                        }
+                                    }
+                                }
+                                None => {
+                                    error!("Readable is not setted!");
+                                    return Err(Box::new(Errors::new("parser is not setted!")));
+                                }
+                            }
+                        }
+                    }
+                    None => {
+                        error!("Parser is not setted!");
+                        return Err(Box::new(Errors::new("parser is not setted!")));
+                    }
+                },
                 Err(_) => {
                     error!("failed to read buffer!");
                 }
@@ -47,10 +76,8 @@ impl SerialPort {
         }
     }
 }
-
-impl IWritable for SerialPort {
-    async fn write(&mut self) -> Result<(), Box<dyn Error>> {
-        todo!("implement it");
+impl IWrittable for SerialPort {
+    fn write(&mut self, data: String) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 }

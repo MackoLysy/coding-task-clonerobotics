@@ -11,6 +11,9 @@ impl Errors {
             msg: msg.to_string(),
         }
     }
+    pub fn err(&self) -> String {
+        self.msg.to_string()
+    }
 }
 
 impl fmt::Display for Errors {
