@@ -11,7 +11,7 @@ pub struct ArgParser {
     host: String,
     #[clap(long, env, default_value = "7100")]
     port: u16,
-    #[clap(long, env, default_value = "./")]
+    #[clap(long, env, default_value = "./database.db3")]
     databse_path: String,
 }
 impl ArgParser {

@@ -12,7 +12,6 @@ impl Device {
             running: false,
             sleep: 1000.0,
             led_state: false,
-            serialDevice: None,
         }
     }
 
@@ -70,19 +69,6 @@ impl Device {
             CommandType::Config => return Some("$2,OK\n".to_string()),
         }
         None
-    }
-    fn send(&self, data: String) {
-        match self.serialDevice.as_ref() {
-            Some(m) => {
-                let device = m.try_lock();
-                if (device.is_ok()) {
-                    device.unwrap().write(data).unwrap();
-                }
-            }
-            None => {
-                error!("Serial device is not setted!");
-            }
-        }
     }
 }
 

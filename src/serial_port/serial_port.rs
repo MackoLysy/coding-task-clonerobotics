@@ -48,7 +48,7 @@ impl SerialPort {
                                 Some(r) => {
                                     let mut guard = r.lock().unwrap();
                                     let val = guard.read(val.unwrap());
-                                    if (val.is_some()) {
+                                    if val.is_some() {
                                         match port.write_all(val.unwrap().as_bytes()).await {
                                             Ok(_) => {
                                                 trace!("data sended!")
