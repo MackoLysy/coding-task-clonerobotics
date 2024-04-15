@@ -1,10 +1,11 @@
 use self::command_parser::parse_config;
 
 use super::*;
-use crate::errors::Errors;
+use crate::{data_base::DeviceModel, errors::Errors};
 use command_parser::CommandType;
 use log::*;
-use std::error::Error;
+use rand::{thread_rng, Rng};
+use std::{error::Error, time::Duration};
 
 impl Device {
     pub fn new() -> Self {
@@ -12,6 +13,7 @@ impl Device {
             running: false,
             sleep: 1000.0,
             led_state: false,
+            data_base: None,
         }
     }
 
@@ -70,6 +72,34 @@ impl Device {
         }
         None
     }
+    pub async fn run(&mut self) -> Result<(), Box<dyn Error>> {
+        loop {
+            if !self.running {
+                continue;
+            }
+            info!("id: {:?}", std::thread::current().id());
+            let mut rnd = tokio::time::sleep(Duration::from_millis(self.sleep as u64)).await;
+            let device = Device::get_data();
+            trace!("getting data: {:?}", device);
+            match self.data_base.clone() {
+                Some(data_base) => {
+                    let mut lock = data_base.lock().unwrap();
+                    lock.add_device(&device)?;
+                }
+                None => {
+                    error!("data base is not setted!");
+                    return Err(Box::new(Errors::new("data base is not setted!")));
+                }
+            }
+        }
+    }
+    fn get_data() -> DeviceModel {
+        let mut rng = thread_rng();
+        let rng_p: f64 = rng.gen_range(0.0..10000.0);
+        let rng_t: f64 = rng.gen_range(0.0..100.0);
+        let rng_v: f64 = rng.gen_range(0.0..20.0);
+        DeviceModel::new(rng_p, rng_t, rng_v, 0.0)
+    }
 }
 
 impl IReadable for Device {
@@ -118,8 +148,6 @@ impl IReadable for Device {
 
 #[cfg(test)]
 mod tests {
-    use std::result;
-
     use super::*;
     #[test]
     fn test_start() {

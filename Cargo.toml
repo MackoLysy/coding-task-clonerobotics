@@ -19,3 +19,4 @@ use = "0.0.1-pre.0"
 serial2-tokio = { version = "0.1.9" }
 regex = "1.10.4"
 sqlite = "0.34.0"
+rand = "0.8.5"

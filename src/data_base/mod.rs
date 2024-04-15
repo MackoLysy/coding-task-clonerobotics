@@ -5,7 +5,7 @@ mod data_base;
 pub struct DataBase {
     connection: sqlite::Connection,
 }
-
+#[derive(Debug)]
 pub struct DeviceModel {
     pressure: f64,
     temperature: f64,

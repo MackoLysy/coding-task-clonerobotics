@@ -38,7 +38,10 @@ impl DataBase {
         stmt.bind((2, device.get_temperature())).unwrap();
         stmt.bind((3, device.get_velocity())).unwrap();
         match stmt.next() {
-            Ok(_) => return Ok(()),
+            Ok(_) => {
+                trace!("elemet is added {:?}", device);
+                return Ok(());
+            }
             Err(err) => {
                 error!("{:#?}", err);
                 return Err(Box::new(Errors::new(err.message.unwrap().as_str())));
